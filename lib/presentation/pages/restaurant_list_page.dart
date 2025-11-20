@@ -50,102 +50,116 @@ class _RetaurantListPageViewState extends State<RetaurantListPageView> {
           ),
           icon: Icon(Icons.refresh),
         ),
-        body: BlocConsumer<RestaurantListBloc, RestaurantListState>(
-          listener: (context, state) {},
-          builder: (context, state) {
-            return switch (state) {
-              RestaurantLoadedState() => Column(
-                spacing: 8.0,
+        body: RefreshIndicator(
+          onRefresh: () async {
+            context.read<RestaurantListBloc>().add(
+              LoadListEvent(radius: widget.radius),
+            );
+          },
+          child: BlocConsumer<RestaurantListBloc, RestaurantListState>(
+            listener: (context, state) {},
+            builder: (context, state) {
+              return switch (state) {
+                RestaurantLoadedState() => Column(
+                  spacing: 8.0,
 
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                      child: SizedBox(
+                        height: 44,
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: PlaceTypeEnum.values.map((e) {
+                              final selected =
+                                  state.includedTypes?.contains(e) ?? false;
+                              return Padding(
+                                padding: const EdgeInsets.only(right: 8.0),
+                                child: FilterChip(
+                                  label: Text(e.name),
+                                  selected: selected,
+                                  onSelected: (selected) => context
+                                      .read<RestaurantListBloc>()
+                                      .add(AddTypeEvent(type: e)),
+                                  selectedColor: Theme.of(
+                                    context,
+                                  ).colorScheme.onSecondary,
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      ),
                     ),
-                    child: SizedBox(
-                      height: 44,
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                      child: SizedBox(
+                        height: 44,
                         child: Row(
-                          children: PlaceTypeEnum.values.map((e) {
-                            final selected =
-                                state.includedTypes?.contains(e) ?? false;
-                            return Padding(
-                              padding: const EdgeInsets.only(right: 8.0),
-                              child: FilterChip(
-                                label: Text(e.name),
-                                selected: selected,
-                                onSelected: (selected) => context
+                          children: RankPreferenceEnum.values.map((rank) {
+                            final selected = state.rankPreference == rank;
+                            return Expanded(
+                              child: CheckboxListTile(
+                                value: selected,
+                                title: Text(
+                                  "rank by:${rank.name}",
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                ),
+                                onChanged: (bool) => context
                                     .read<RestaurantListBloc>()
-                                    .add(AddTypeEvent(type: e)),
-                                selectedColor: Theme.of(
-                                  context,
-                                ).colorScheme.onSecondary,
+                                    .add(AddRankEvent(rank: rank)),
                               ),
                             );
                           }).toList(),
                         ),
                       ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
-                    ),
-                    child: SizedBox(
-                      height: 44,
-                      child: Row(
-                        children: RankPreferenceEnum.values.map((rank) {
-                          final selected = state.rankPreference == rank;
-                          return Expanded(
-                            child: CheckboxListTile(
-                              value: selected,
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: ListView.separated(
+                          itemBuilder: (BuildContext context, int index) {
+                            if (index == state.restaurants.length)
+                              return Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Center(
+                                  child: CircularProgressIndicator(),
+                                ),
+                              );
+                            final item = state.restaurants[index];
+                            return ListTile(
                               title: Text(
-                                "rank by:${rank.name}",
-                                style: Theme.of(context).textTheme.bodyMedium,
+                                item.displayName,
+                                semanticsLabel:
+                                    "restaurant $index ${item.displayName}",
                               ),
-                              onChanged: (bool) => context
-                                  .read<RestaurantListBloc>()
-                                  .add(AddRankEvent(rank: rank)),
-                            ),
-                          );
-                        }).toList(),
+                              subtitle: Text(
+                                item.formattedAddress,
+                                semanticsLabel:
+                                    "address $index ${item.formattedAddress}",
+                              ),
+                            );
+                          },
+                          separatorBuilder: (BuildContext context, int index) =>
+                              const Divider(height: 1),
+                          itemCount: state.restaurants.length + 1,
+                        ),
                       ),
                     ),
-                  ),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: ListView.separated(
-                        itemBuilder: (BuildContext context, int index) {
-                          final item = state.restaurants[index];
-                          return ListTile(
-                            title: Text(
-                              item.displayName,
-                              semanticsLabel:
-                                  "restaurant $index ${item.displayName}",
-                            ),
-                            subtitle: Text(
-                              item.formattedAddress,
-                              semanticsLabel:
-                                  "address $index ${item.formattedAddress}",
-                            ),
-                          );
-                        },
-                        separatorBuilder: (BuildContext context, int index) =>
-                            const Divider(height: 1),
-                        itemCount: state.restaurants.length,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              RestaurantErrorState() => Center(child: Text("error")),
-              _ => const Center(child: CircularProgressIndicator()),
-            };
-          },
+                  ],
+                ),
+                RestaurantErrorState() => Center(child: Text("error")),
+                _ => const Center(child: CircularProgressIndicator()),
+              };
+            },
+          ),
         ),
       ),
     );
