@@ -1,4 +1,4 @@
-# pan_pan_reporter
+# chowfinder
 
 ## Setup Instructions
 
