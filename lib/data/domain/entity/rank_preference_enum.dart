@@ -1,0 +1,1 @@
+enum RankPreferenceEnum { popularity, distance }

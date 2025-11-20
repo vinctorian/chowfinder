@@ -1,0 +1,31 @@
+name: chowfinder
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ^3.9.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  path: ^1.9.1
+  flutter_clean_architecture: ^6.0.2
+  flutter_bloc: ^9.1.1
+  bloc_concurrency: ^0.3.0
+  get_it: ^8.2.0
+  shared_preferences: ^2.5.3
+  bloc_test: ^10.0.0
+  mockito: ^5.5.0
+  mocktail: ^1.0.4
+  build_runner: ^2.7.1
+  dio: ^5.9.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true

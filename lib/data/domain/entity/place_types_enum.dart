@@ -1,0 +1,16 @@
+enum PlaceTypeEnum {
+  restaurant,
+  cafe,
+  bar,
+  bakery,
+  diner,
+  pub,
+  deli,
+  fast_food_restaurant,
+  italian_restaurant,
+  chinese_restaurant,
+  mexican_restaurant,
+  indian_restaurant,
+  japanese_restaurant,
+  seafood_restaurant,
+}
